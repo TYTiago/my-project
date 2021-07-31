@@ -1,17 +1,225 @@
 <!DOCTYPE html>
-<html lang="">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-  </head>
-  <body>
-    <noscript>
-      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
-    </noscript>
-    <div id="app"></div>
-    <!-- built files will be auto injected -->
-  </body>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample</title>
+    <link href="/css/project.css" rel="stylesheet">
+</head>
+<body>
+  <p style="text-align: center;"><b>自分は<span style="color: #ff0000; font-size: 1.4em;">大幅な節約</span>に成功！</b></p>
+  <p style="text-align: center;"><span style="font-size: 0.8em;"><span style="font-weight: 400;">その分、嫁の機嫌も自分のお小遣いも上々↑です。笑</span></span></p>
+  <p style="text-align: center;">＼自分なら、いくら節約できる？／</p>
+  <p style="text-align: center;">1日に吸うタバコの量を選択してください</p>
+  <div id="app" class='box'>
+    <p class="control">
+      <input type="radio" @click="isActive = true"　name = "q1" ref = "q2" value = "10"
+        v-on:click='addVal(10)'
+      >+ 10
+      <input type="radio" @click="isActive = true" name = "q1" ref = "q2" value="100"
+        v-on:click='addVal(100)'
+      >+ 100
+      <input type="radio" @click="isActive = true" name = "q1" ref = "q2" value= "1000"
+        v-on:click='addVal(1000)'
+      >+ 1000
+      <input type="radio" @click="isActive = true" name = "q1" ref = "q2" value= "2"
+        v-on:click='doubleVal'
+      >x 2
+    </p>
+    <p class="count">
+      <span v-show="is_comma">{{count | addComma}}</span>
+      <span v-show="!is_comma">{{count}}</span>
+    </p>
+        <p class="mode">
+          <button type="submit" @click="active" v-on:click = "doCalc()">計算する</button>
+        </p>
+        <div v-if="isActive"></div>
+        <div v-else>
+          <p class="mb-kiss-text">『DR.VAPEに変えた場合』1年間で</p>
+          <div class="mb-kiss-display">
+            <span class="mb-kiss-display-content" style="color: #ff0000; font-size: 1.4em;" >{{result}}</span><span class="mb-kiss-suffix">円</span>
+          </div>
+          <div class="mb-kiss-display-text">
+            も安くなります!
+          </div>
+
+        </div>
+        <div class="chart_container">
+          <canvas id="myChart" width="400" height="400"></canvas>
+        </div>
+  </div>
+</body>
 </html>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.1.0/lib/anime.min.js"></script>
+<script>
+
+var val = {result:0};
+
+new Vue({
+  el: '#app',
+  data: {
+    num: 1000,
+    count: 0,
+    is_comma: true,
+    isActive: true,
+    result:0
+  },
+  watch: {
+    num (val) {
+      this.setCount(val)
+    }
+  },
+  methods: {
+    active: function () {
+      this.isActive = !this.isActive;
+    },
+    addVal (n) {
+      this.num = n
+    },
+    doubleVal () {
+      this.num *= 2
+    },
+    setCount (val) {
+      const obj = { n: this.count }
+      anime({
+        targets: obj,
+        n: val,
+        round: 1,
+        duration: 500,
+        easing: 'linear',
+        update: () => {
+          this.count = obj.n
+        }
+      })
+    },
+    doCalc (val){
+      const obj = { n: this.count }
+      anime({
+        targets: obj,
+        n: val,
+        round: 1,
+        duration: 500,
+        easing: 'linear',
+        update: () => {
+          this.result = obj.n / 2;
+        }
+      })
+    },
+  },
+  filters: {
+    addComma (val) {
+      return val.toLocaleString()
+    }
+  },
+  mounted () {
+    this.setCount(this.num);
+  }
+})
+
+var elemSwitch = new Vue({
+    el: "#elemSwitch",
+    data: {
+        isActive: true
+    },
+    methods: {
+        active: function () {
+            this.isActive = !this.isActive;
+        }
+    }
+});
+
+
+//グラフ
+window.onload = function() {
+  var ctx = document.getElementById("myChart").getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: ["赤", "青"],
+        hidden: false,
+        datasets: [{
+            data: [100, 50],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255,99,132,1)',
+                'rgba(54, 162, 235, 1)',
+            ],
+            borderWidth: 1
+        }]
+        
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true
+                }
+            }]
+        }
+    }
+  });
+}
+</script>
+
+<style>
+  p,h2 {
+  margin: 0;
+}
+
+.box {
+  max-width: 400px;
+  margin: 0 auto;
+  border: 1px solid red;
+  padding: 1em;
+  text-align: center;
+}
+
+.count {
+  font-size: 40px;
+  text-align: right;
+  padding: 0.25em 0.5em;
+  background-color: #333;
+  color: #fff;
+  margin-top: 20px;
+}
+
+.mode {
+  margin-top: 12px;
+}
+
+.control {
+  position: relative;
+}
+.reset {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.mb-kiss {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  overflow: hidden;
+  line-height: 1.6;
+}
+.myBarChart{
+  max-width: 400px;
+}
+
+
+@media screen and (min-width: 768px) {
+  .chart_container {
+    max-width: 200px;
+    margin: auto;
+  }
+}
+
+
+</style>
+
